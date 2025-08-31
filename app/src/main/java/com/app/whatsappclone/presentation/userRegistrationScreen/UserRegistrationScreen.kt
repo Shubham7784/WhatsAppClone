@@ -37,12 +37,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.app.whatsappclone.R
 import com.app.whatsappclone.presentation.navigation.Routes
+import com.app.whatsappclone.presentation.viewModel.PhoneAuthViewModel
+
 
 @Composable
-fun UserRegistrationScreen(navHostController: NavHostController)
+fun UserRegistrationScreen(navHostController: NavHostController,phoneAuthViewModel: PhoneAuthViewModel = hiltViewModel())
 {
     var expanded = remember { mutableStateOf(false) }
     var selectedCountry = remember { mutableStateOf("India") }

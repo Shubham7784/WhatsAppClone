@@ -2,23 +2,30 @@ package com.app.whatsappclone.presentation.viewModel
 
 import android.app.Activity
 import android.content.Context
+import android.graphics.Bitmap
+import android.util.Base64
 import android.util.Log
 import androidx.compose.ui.text.capitalize
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.ViewModel
 import com.app.whatsappclone.WhatsAppCloneApplication
 import com.app.whatsappclone.model.PhoneAuthUser
+import com.google.firebase.Firebase
 import com.google.firebase.FirebaseException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthOptions
 import com.google.firebase.auth.PhoneAuthProvider
+import com.google.firebase.auth.auth
 import com.google.firebase.database.FirebaseDatabase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import java.io.ByteArrayOutputStream
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import androidx.core.content.edit
+
 
 @HiltViewModel
 class PhoneAuthViewModel @Inject constructor(
@@ -87,7 +94,7 @@ class PhoneAuthViewModel @Inject constructor(
     }
     private fun markUserAsSignedIn(context: Context) {
         val sharedPreference = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-        sharedPreference.edit().putBoolean("isSignedIn",true).apply()
+        sharedPreference.edit { putBoolean("isSignedIn", true) }
     }
 
     private fun fetchUserProfile(userId: String) {
@@ -121,6 +128,40 @@ class PhoneAuthViewModel @Inject constructor(
 
         val credential = PhoneAuthProvider.getCredential(currentAuthState.verificationId,otp)
         signInWithCredential(credential,context)
+    }
+
+    fun saveUserProfile(userId:String,name: String,status:String,profimeImage: Bitmap)
+    {
+        val encodedImage = profimeImage?.let{ convertBitmapToBase64(it)  }
+        val database = FirebaseDatabase.getInstance().reference
+        val userProfile = PhoneAuthUser(
+            userId = userId,
+            name = name,
+            status = status,
+            profileImage = encodedImage ?: "",
+            phoneNumber = Firebase.auth.currentUser?.phoneNumber?:"")
+
+        database.child("users").child(userId).setValue(userProfile)
+    }
+
+    private fun convertBitmapToBase64(bitmap: Bitmap): String
+    {
+        val byteArrayOutputStream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG,100,byteArrayOutputStream)
+        val bytes = byteArrayOutputStream.toByteArray()
+        return Base64.encodeToString(bytes,Base64.DEFAULT)
+    }
+
+    fun resetAuthState()
+    {
+        _authState.value = AuthState.Ideal
+    }
+
+    fun signOut(activity: Activity)
+    {
+        firebaseAuth.signOut()
+        val sharedReference = activity.getSharedPreferences("app_prefs",Activity.MODE_PRIVATE)
+        sharedReference.edit { putBoolean("isSignedIn", false) }
     }
 
 }
