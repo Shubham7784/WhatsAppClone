@@ -1,0 +1,25 @@
+package com.app.whatsappclone.DI
+
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
+import jakarta.inject.Singleton
+
+@Module
+@InstallIn(SingletonComponent::class)
+object AppModule {
+    @Provides
+    @Singleton
+    fun provideFirebaseAuth() : FirebaseAuth{
+        return FirebaseAuth.getInstance()
+    }
+
+    @Provides
+    @Singleton
+    fun providesDatabase(): FirebaseDatabase{
+        return FirebaseDatabase.getInstance()
+    }
+}
