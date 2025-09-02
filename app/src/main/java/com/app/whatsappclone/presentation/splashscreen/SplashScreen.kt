@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.app.whatsappclone.presentation.navigation.Routes
 import kotlinx.coroutines.delay
+import kotlinx.serialization.Serializable
 
 
 @Composable

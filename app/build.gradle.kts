@@ -1,12 +1,13 @@
 plugins {
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.google.gms.google.services)
     id("com.google.devtools.ksp") version "2.2.10-2.0.2"
     id("com.google.dagger.hilt.android")
     kotlin("kapt")
     id ("dagger.hilt.android.plugin")
+    id("org.jetbrains.kotlin.plugin.serialization") version "2.0.0"
 }
 
 android {
@@ -81,5 +82,6 @@ dependencies {
     // (Optional) Firebase Authentication with Google Play services
     implementation(libs.play.services.auth)
     implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.kotlinx.serialization.json)
 
 }
