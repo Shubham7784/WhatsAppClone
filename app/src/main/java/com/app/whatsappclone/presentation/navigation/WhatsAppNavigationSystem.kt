@@ -9,6 +9,7 @@ import com.app.whatsappclone.presentation.communityScreen.CommunityScreen
 import com.app.whatsappclone.presentation.homeScreen.HomeScreen
 import com.app.whatsappclone.presentation.splashscreen.SplashScreen
 import com.app.whatsappclone.presentation.updateScreen.UpdateScreen
+import com.app.whatsappclone.presentation.userRegistrationProfileScreen.UserRegistrationProfile
 import com.app.whatsappclone.presentation.userRegistrationScreen.UserRegistrationScreen
 import com.app.whatsappclone.presentation.welcomeScreen.WelcomScreen
 
@@ -46,6 +47,10 @@ fun WhatsAppNavigationSystem()
 
         composable<Routes.CallScreen>{
             CallScreen(navController)
+        }
+
+        composable<Routes.UserProfileScreen>{
+            UserRegistrationProfile(navController)
         }
     }
 }

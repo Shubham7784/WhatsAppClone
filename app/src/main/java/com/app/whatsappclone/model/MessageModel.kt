@@ -1,10 +1,11 @@
-package com.app.whatsappclone.presentation.chatDesign
+package com.app.whatsappclone.model
 
 import java.time.LocalDateTime
 
 data class MessageModel (
-    val message : String,
-    val time : LocalDateTime,
+    val senderPhoneNumber: String = "",
+    val message : String = "",
+    val time : Long = 0L,
     val isIncoming : Boolean = true,
     val isWaiting : Boolean = true,
     val isSent : Boolean = false,

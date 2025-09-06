@@ -83,5 +83,6 @@ dependencies {
     implementation(libs.play.services.auth)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.coil.compose)
 
 }

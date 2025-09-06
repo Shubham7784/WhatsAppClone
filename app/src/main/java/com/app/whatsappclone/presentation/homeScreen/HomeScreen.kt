@@ -36,7 +36,7 @@ import androidx.navigation.NavHostController
 import com.app.whatsappclone.R
 import com.app.whatsappclone.presentation.bottomNavigation.BottomNavigation
 import com.app.whatsappclone.presentation.chatDesign.ChatScreen
-import com.app.whatsappclone.presentation.chatDesign.MessageModel
+import com.app.whatsappclone.model.MessageModel
 import com.app.whatsappclone.presentation.chatListDesign.ChatDesign
 import com.app.whatsappclone.presentation.chatListDesign.ChatListModel
 import java.time.LocalDateTime

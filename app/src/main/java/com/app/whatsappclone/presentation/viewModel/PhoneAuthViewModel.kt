@@ -130,7 +130,7 @@ class PhoneAuthViewModel @Inject constructor(
         signInWithCredential(credential,context)
     }
 
-    fun saveUserProfile(userId:String,name: String,status:String,profimeImage: Bitmap)
+    fun saveUserProfile(userId:String,name: String,status:String,profimeImage: Bitmap?)
     {
         val encodedImage = profimeImage?.let{ convertBitmapToBase64(it)  }
         val database = FirebaseDatabase.getInstance().reference
