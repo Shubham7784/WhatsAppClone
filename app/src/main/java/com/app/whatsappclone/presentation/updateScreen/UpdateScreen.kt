@@ -47,57 +47,6 @@ fun UpdateScreen(navController: NavHostController) {
     updateData.add(UpdateDataModel(R.drawable.sharukh_khan, "Shahrukh Bhoi", "10:00 AM", true))
 
     val channelsData = ArrayList<ChatListModel>()
-    channelsData.add(ChatListModel(
-            R.drawable.profile_placeholder,
-            "Channel Name",
-            "10:00 AM",
-            false,
-            0
-        ))
-    channelsData.add(ChatListModel(
-            R.drawable.profile_placeholder,
-            "Channel Name",
-            "10:00 AM",
-            false,
-            0
-        ))
-    channelsData.add(ChatListModel(
-            R.drawable.profile_placeholder,
-            "Channel Name",
-            "10:00 AM",
-            false,
-            0
-        ))
-    channelsData.add(ChatListModel(
-            R.drawable.profile_placeholder,
-            "Channel Name",
-            "10:00 AM",
-            false,
-            0
-        ))
-    channelsData.add(ChatListModel(
-            R.drawable.profile_placeholder,
-            "Channel Name",
-            "10:00 AM",
-            false,
-            0
-        ))
-    channelsData.add(ChatListModel(
-            R.drawable.profile_placeholder,
-            "Channel Name",
-            "10:00 AM",
-            false,
-            0
-        ))
-    channelsData.add(ChatListModel(
-            R.drawable.profile_placeholder,
-            "Channel Name",
-            "10:00 AM",
-            false,
-            0
-        ))
-    channelsData.add(ChatListModel(R.drawable.profile_placeholder, "Channel Name", "10:00 AM", false, 0))
-
     val newChannelsData = ArrayList<NewChannelsListModel>()
     newChannelsData.add(NewChannelsListModel(
             R.drawable.profile_placeholder,
@@ -114,7 +63,7 @@ fun UpdateScreen(navController: NavHostController) {
     val horizontalScrollState = rememberScrollState()
 
     Scaffold(
-        bottomBar = { BottomNavigation() },
+        bottomBar = { BottomNavigation(navController) },
         floatingActionButton = {
             Column {
                 FloatingActionButton(
@@ -217,7 +166,7 @@ fun UpdateScreen(navController: NavHostController) {
 
             Column {
                 for (model in channelsData) {
-                    ChatDesign(model)
+                    ChatDesign(model,{})
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))

@@ -16,6 +16,7 @@ import androidx.compose.material3.Badge
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -26,17 +27,32 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.rememberImagePainter
 import com.app.whatsappclone.R
+import com.app.whatsappclone.presentation.viewModel.BaseViewModel
 
 @Composable
-fun ChatDesign(chatListModel: ChatListModel,onClick: @Composable () -> Unit = {}) {
+fun ChatDesign(chatListModel: ChatListModel,onClick: () -> Unit,baseViewModel: BaseViewModel = BaseViewModel()) {
     Row(
         modifier = Modifier.padding(10.dp, top = 10.dp, end = 10.dp),
         verticalAlignment = Alignment.CenterVertically
     )
     {
+
+        val profileImage = chatListModel.image
+
+        val profileBitmap = remember {
+            profileImage?.let { baseViewModel.base64toBitmap(it) }
+        }
+
         Image(
-            painter = painterResource(chatListModel.image), contentDescription = "Profile Image",
+            painter = if(profileBitmap!=null){
+                rememberImagePainter(profileBitmap)
+            }
+            else{
+                painterResource(R.drawable.profile_placeholder)
+            },
+            contentDescription = "Profile Image",
             modifier = Modifier
                 .size(60.dp)
                 .clip(shape = CircleShape)
@@ -54,19 +70,19 @@ fun ChatDesign(chatListModel: ChatListModel,onClick: @Composable () -> Unit = {}
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = chatListModel.name,
+                    text = chatListModel.name!!,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Normal
                 )
 
-                Text(text = chatListModel.time, color = Color.DarkGray)
+                Text(text = chatListModel.messages?.peek()?.time?.hour.toString() + ":" + chatListModel.messages?.peek()?.time?.minute.toString(), color = Color.DarkGray)
             }
             Spacer(modifier = Modifier.height(4.dp))
 
             Row(modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween){
 
-                if(!chatListModel.messages.isEmpty()){
+                if(chatListModel.messages?.isNotEmpty()!!){
                     Text(
                         text = chatListModel.messages.peek().message,
                         color = Color.DarkGray,

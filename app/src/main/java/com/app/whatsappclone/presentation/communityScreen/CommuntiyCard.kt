@@ -153,7 +153,7 @@ fun CommunityCard(communityModel: CommunityModel) {
 
         }
         Row {
-            ChatDesign(chatListModel = communityModel.groupModel[0])
+            ChatDesign(chatListModel = communityModel.groupModel[0],{})
         }
 
         Row(modifier = Modifier.fillMaxWidth())

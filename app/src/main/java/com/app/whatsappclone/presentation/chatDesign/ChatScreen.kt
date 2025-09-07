@@ -74,7 +74,7 @@ fun ChatScreen(chatListModel: ChatListModel) {
                     }
                 }
 
-                for (model in chatListModel.messages) {
+                for (model in chatListModel.messages!!) {
                     if(model.isIncoming)
                         IncomingMessageCard(model)
                     else

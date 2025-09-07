@@ -64,7 +64,7 @@ fun OutgoingMessageCard(messageModel: MessageModel) {
                 horizontalArrangement = Arrangement.End
             ) {
                 var time = ""
-                if(messageModel.time.hour <12 )
+                if(messageModel.time?.hour!! <12 )
                     time += (messageModel.time.hour).toString() + ":" + messageModel.time.minute+ "AM"
                 else if(messageModel.time.hour == 12)
                     time+= "12"+":" + messageModel.time.minute.toString() + "PM"
@@ -141,7 +141,7 @@ fun IncomingMessageCard(messageModel: MessageModel) {
                 horizontalArrangement = Arrangement.End
             ) {
                 var time = ""
-                if(messageModel.time.hour <=12 )
+                if(messageModel.time?.hour!! <=12 )
                     time += (messageModel.time.hour).toString() +":" + messageModel.time.minute+ "AM"
                 else if(messageModel.time.hour == 0)
                     time+= "12"+ ":"+ messageModel.time.minute.toString() + "PM"

@@ -1,5 +1,7 @@
 package com.app.whatsappclone.presentation.viewModel
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.telecom.Call
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -13,6 +15,13 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import okio.IOException
+import java.io.ByteArrayInputStream
+import java.io.InputStream
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.util.Stack
+import kotlin.io.encoding.Base64
 
 class BaseViewModel : ViewModel() {
     fun searchUserByPhnoneNumber(phoneNumber: String, callback: (ChatListModel?) -> Unit) {
@@ -127,7 +136,7 @@ class BaseViewModel : ViewModel() {
                 MessageModel(
                     senderPhoneNumber,
                     message,
-                    System.currentTimeMillis(),
+                    LocalDateTime.now(),
                     false,
                     false,
                     true,
@@ -143,7 +152,7 @@ class BaseViewModel : ViewModel() {
                 MessageModel(
                     senderPhoneNumber,
                     message,
-                    System.currentTimeMillis(),
+                    LocalDateTime.now(),
                     true
                 )
             )
@@ -213,5 +222,80 @@ class BaseViewModel : ViewModel() {
                     
                 }
             })
+    }
+
+    fun loadChatList(
+        currentUserPhoneNumber :String,
+        onChatListLoaded: (List<ChatListModel>) -> Unit
+    )
+    {
+        val chatList = mutableListOf<ChatListModel>()
+        val chatRef = FirebaseDatabase.getInstance().reference
+            .child("chats")
+            .child(currentUserPhoneNumber)
+
+        chatRef.addListenerForSingleValueEvent(object: ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if(snapshot.exists())
+                {
+                    snapshot.children.forEach { child ->
+                        val phoneNumber = child?.key?:return@forEach
+                        val name = child.child("name").value as? String?:return@forEach
+                        val image = child.child("image").value as? String?:return@forEach
+
+
+                        val profileImageBitmap = decodeBase64ToBitmap(image)
+
+                        fetchLastMessageFromChat(currentUserPhoneNumber,phoneNumber,{
+                            lastMessage , time ->
+                            chatList.add(
+                                ChatListModel(
+                                    name = name,
+                                    image = image,
+                                )
+                            )
+
+                            if(chatList.size == snapshot.childrenCount.toInt())
+                            {
+                                onChatListLoaded(chatList)
+                            }
+                            else
+                            {
+                                onChatListLoaded(emptyList())
+                            }
+                        })
+
+                    }
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                onChatListLoaded(emptyList())
+            }
+        })
+    }
+
+
+    private fun decodeBase64ToBitmap(base64String: String): Bitmap? {
+        return try{
+            val decodedBytes = android.util.Base64.decode(base64String,android.util.Base64.DEFAULT)
+            BitmapFactory.decodeByteArray(decodedBytes,0,decodedBytes.size)
+        }
+        catch (e: IOException)
+        {
+            null
+        }
+    }
+
+    fun base64toBitmap(base64String : String):Bitmap?{
+        return try{
+            val decodedBytes = android.util.Base64.decode(base64String,android.util.Base64.DEFAULT)
+            val inputStream : InputStream = ByteArrayInputStream(decodedBytes)
+            BitmapFactory.decodeStream(inputStream)
+        }
+        catch (e: IOException)
+        {
+            null
+        }
     }
 }

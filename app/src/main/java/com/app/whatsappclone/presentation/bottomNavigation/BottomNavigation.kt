@@ -1,5 +1,6 @@
 package com.app.whatsappclone.presentation.bottomNavigation
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,11 +26,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.app.whatsappclone.R
+import com.app.whatsappclone.presentation.navigation.Routes
 
 @Composable
-@Preview(showSystemUi = true)
-fun BottomNavigation() {
+fun BottomNavigation(navController: NavHostController) {
     BottomAppBar(tonalElevation = 12.dp, containerColor = Color.White) {
         Row(
             modifier = Modifier
@@ -42,6 +44,7 @@ fun BottomNavigation() {
                 modifier = Modifier
                     .padding(10.dp)
                     .align(Alignment.CenterVertically)
+                    .clickable(true, onClick = {navController.navigate(Routes.HomeScreen)})
             ) {
 
                 Icon(
@@ -65,6 +68,7 @@ fun BottomNavigation() {
             Column(
                 modifier = Modifier
                     .align(Alignment.CenterVertically)
+                    .clickable(true, onClick = {navController.navigate(Routes.UpdateScreen)})
             ) {
 
                 Icon(
@@ -92,6 +96,7 @@ fun BottomNavigation() {
                 modifier = Modifier
                     .padding(10.dp)
                     .align(Alignment.CenterVertically)
+                    .clickable(true, onClick = {navController.navigate(Routes.CommunityScreen)})
             ) {
 
                 Icon(
@@ -118,6 +123,7 @@ fun BottomNavigation() {
                 modifier = Modifier
                     .padding(10.dp)
                     .align(Alignment.CenterVertically)
+                    .clickable(true, onClick = {navController.navigate(Routes.CallScreen)})
             ) {
 
                 Icon(

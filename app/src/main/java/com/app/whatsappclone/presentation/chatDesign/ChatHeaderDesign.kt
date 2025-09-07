@@ -32,13 +32,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.rememberImagePainter
 import com.app.whatsappclone.R
 import com.app.whatsappclone.presentation.chatListDesign.ChatListModel
+import com.app.whatsappclone.presentation.viewModel.BaseViewModel
 import org.w3c.dom.Text
 import java.time.LocalDateTime
 
 @Composable
-fun ChatHeaderDesign(chatListModel: ChatListModel) {
+fun ChatHeaderDesign(chatListModel: ChatListModel,baseViewModel: BaseViewModel= BaseViewModel()) {
     val isExpanded = remember { mutableStateOf(false) }
     Row(
         modifier = Modifier
@@ -56,8 +58,19 @@ fun ChatHeaderDesign(chatListModel: ChatListModel) {
                 )
             }
         }
+
+        val profileImage = chatListModel.image
+
+        val profileBitmap = remember {
+            profileImage?.let { baseViewModel.base64toBitmap(it) }
+        }
         Image(
-            painter = painterResource(chatListModel.image),
+            painter = if(profileBitmap!=null){
+                rememberImagePainter(profileBitmap)
+            }
+            else{
+                painterResource(R.drawable.profile_placeholder)
+            },
             contentDescription = "Profile Picture",
             modifier = Modifier
                 .size(50.dp)
@@ -69,7 +82,7 @@ fun ChatHeaderDesign(chatListModel: ChatListModel) {
         Column(modifier = Modifier.align(Alignment.CenterVertically)) {
             Row(modifier = Modifier.align(Alignment.CenterHorizontally)) {
                 Text(
-                    text = chatListModel.name,
+                    text = chatListModel.name!!,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Normal,
                     modifier = Modifier.align(Alignment.CenterVertically)

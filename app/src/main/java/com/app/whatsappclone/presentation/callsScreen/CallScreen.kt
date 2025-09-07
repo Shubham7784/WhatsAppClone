@@ -41,7 +41,7 @@ fun CallScreen(navController: NavHostController) {
         CallDataModel("Name","Number",false, LocalDateTime.now(),false,true,true,0),)
     Scaffold(
         topBar = { CallTopBar() },
-        bottomBar = { BottomNavigation() }
+        bottomBar = { BottomNavigation(navController) }
     ) { innerPadding ->
         Column(
             modifier = Modifier

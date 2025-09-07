@@ -1,5 +1,6 @@
 package com.app.whatsappclone.presentation.homeScreen
 
+import android.widget.Toast
 import androidx.collection.objectListOf
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -22,10 +23,13 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -39,61 +43,33 @@ import com.app.whatsappclone.presentation.chatDesign.ChatScreen
 import com.app.whatsappclone.model.MessageModel
 import com.app.whatsappclone.presentation.chatListDesign.ChatDesign
 import com.app.whatsappclone.presentation.chatListDesign.ChatListModel
+import com.app.whatsappclone.presentation.navigation.Routes
+import com.app.whatsappclone.presentation.viewModel.BaseViewModel
+import com.google.firebase.auth.FirebaseAuth
 import java.time.LocalDateTime
 import java.util.Stack
 
 @Composable
-fun HomeScreen(navController: NavHostController) {
-    val message = Stack<MessageModel>()
-    message.push(MessageModel("Hello", LocalDateTime.now(), true, false, true, false, false))
-    val chatData = objectListOf<ChatListModel>(
-        ChatListModel(
-            R.drawable.salman_khan,
-            "Salman Bhoi",
-            "10:00 AM",
-            false,
-            0,
-            messages = message
-        ),
-        ChatListModel(
-            R.drawable.sharukh_khan,
-            "Shahrukh Bhoi",
-            "01:00 AM",
-            true,
-            1,
-            messages = message
-        ),
-        ChatListModel(
-            R.drawable.ajay_devgn,
-            "Ajay Devgan",
-            "07:00 PM",
-            true,
-            15,
-            true,
-            messages = message
-        ),
-        ChatListModel(
-            R.drawable.akshay_kumar,
-            "Akshay Kumar",
-            "05:00 AM",
-            false,
-            0,
-            messages = message
-        ),
-        ChatListModel(
-            R.drawable.carryminati,
-            "Carry Bhai",
-            "02:00 AM",
-            false,
-            0,
-            messages = message
-        ),
-        ChatListModel(R.drawable.hrithik_roshan, "Hritik Roshan", "06:30 PM", false, 0, messages = message),
-    )
+fun HomeScreen(navController: NavHostController,homeBaseViewModel: BaseViewModel = BaseViewModel()) {
+
+    var showPopup = remember { mutableStateOf(false) }
+    val chatData = homeBaseViewModel.chatList.collectAsState()
+    val userId = FirebaseAuth.getInstance().currentUser?.uid
+
+    if(userId!=null)
+    {
+        LaunchedEffect(Unit) {
+            homeBaseViewModel.getChatForUser(userId){ chats->
+
+
+            }
+        }
+    }
+
+    var showMenu = remember { mutableStateOf(false) }
 
     var searchText = remember { mutableStateOf("Ask Meta AI or Search") }
 
-    var moreExpanded = remember { mutableStateOf(false) }
 
     var moreSelectedOption = remember { mutableStateOf("") }
     Scaffold(
@@ -129,7 +105,7 @@ fun HomeScreen(navController: NavHostController) {
             }
         },
         bottomBar = {
-            BottomNavigation()
+            BottomNavigation(navController)
         }
     )
     {
@@ -161,7 +137,7 @@ fun HomeScreen(navController: NavHostController) {
 
                     Spacer(modifier = Modifier.width(8.dp))
                     IconButton(
-                        onClick = { moreExpanded.value = true },
+                        onClick = { showMenu.value = true },
                         modifier = Modifier.size(26.dp)
                     ) {
                         Icon(
@@ -169,24 +145,62 @@ fun HomeScreen(navController: NavHostController) {
                             contentDescription = "More"
                         )
                         DropdownMenu(
-                            expanded = moreExpanded.value,
-                            onDismissRequest = { moreExpanded.value = false }) {
-                            objectListOf(
-                                "New group",
-                                "New community",
-                                "New broadcast",
-                                "Linked devices",
-                                "Starred",
-                                "Payments",
-                                "Settings"
-                            ).forEach { option ->
-                                DropdownMenuItem(text = {
-                                    Text(text = option)
-                                }, onClick = {
-                                    moreExpanded.value = false
-                                    moreSelectedOption.value = option
-                                })
-                            }
+                            expanded = showMenu.value,
+                            onDismissRequest = { showMenu.value = false }) {
+                            DropdownMenuItem(text = {
+                                Text("New Group")
+                            },
+                                onClick = {
+                                    showMenu.value = false
+                                }
+                            )
+                            DropdownMenuItem(text = {
+                                Text("New community")
+                            },
+                                onClick = {
+                                    showMenu.value = false
+                                }
+                            )
+                            DropdownMenuItem(text = {
+                                Text("New broadcast")
+                            },
+                                onClick = {
+                                    showMenu.value = false
+                                }
+                            )
+                            DropdownMenuItem(text = {
+                                Text("Linked devices")
+                            },
+                                onClick = {
+                                    showMenu.value = false
+                                }
+                            )
+                            DropdownMenuItem(text = {
+                                Text("Starred")
+                            },
+                                onClick = {
+                                    showMenu.value = false
+                                }
+                            )
+                            DropdownMenuItem(text = {
+                                Text("Payments")
+                            },
+                                onClick = {
+                                    showMenu.value = false
+                                }
+                            )
+                            DropdownMenuItem(text = {
+                                Text("Settngs")
+                            },
+                                onClick = {
+                                    showMenu.value = false
+                                    navController.navigate(Routes.SettingScreen){
+                                        popUpTo(Routes.HomeScreen){
+                                            inclusive = true
+                                        }
+                                    }
+                                }
+                            )
                         }
                     }
 
@@ -204,9 +218,9 @@ fun HomeScreen(navController: NavHostController) {
             }
 
             LazyColumn {
-                items(chatData.asList()) {
-                    ChatDesign(chatListModel = it, onClick = {
-                        navController.navigate(ChatScreen(it))
+                items(chatData.value) { chat ->
+                    ChatDesign(chatListModel = chat, onClick = {
+                        navController.navigate(Routes.ChatScreen)
                     })
                 }
             }

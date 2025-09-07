@@ -43,12 +43,7 @@ fun CommunityScreen(navController: NavHostController) {
 
     val groupData = objectListOf<ChatListModel>(
         ChatListModel(
-            R.drawable.profile_placeholder,
-            "Group Name",
-            "10:00 AM",
-            false,
-            0,
-            false
+            name = "Group Name",
         )
     )
 
@@ -70,7 +65,7 @@ fun CommunityScreen(navController: NavHostController) {
             CommunityTopBar()
         },
         bottomBar = {
-            BottomNavigation()
+            BottomNavigation(navController)
         }
     ) { innerPadding ->
         Column(
