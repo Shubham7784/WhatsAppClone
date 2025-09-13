@@ -32,4 +32,7 @@ sealed class Routes {
     data object ChatScreen : Routes()
     @Serializable
     data object SettingScreen:Routes()
+
+    @Serializable
+    data object ContactScreen: Routes()
 }

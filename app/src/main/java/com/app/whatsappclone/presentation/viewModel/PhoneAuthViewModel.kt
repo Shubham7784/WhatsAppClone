@@ -3,6 +3,7 @@ package com.app.whatsappclone.presentation.viewModel
 import android.app.Activity
 import android.content.Context
 import android.graphics.Bitmap
+import android.provider.ContactsContract
 import android.util.Base64
 import android.util.Log
 import androidx.compose.ui.text.capitalize
@@ -130,9 +131,9 @@ class PhoneAuthViewModel @Inject constructor(
         signInWithCredential(credential,context)
     }
 
-    fun saveUserProfile(userId:String,name: String,status:String,profimeImage: Bitmap?)
+    fun saveUserProfile(userId:String,name: String,status:String,profileImage: Bitmap?)
     {
-        val encodedImage = profimeImage?.let{ convertBitmapToBase64(it)  }
+        val encodedImage = profileImage?.let{ convertBitmapToBase64(it)  }
         val database = FirebaseDatabase.getInstance().reference
         val userProfile = PhoneAuthUser(
             userId = userId,
@@ -163,7 +164,6 @@ class PhoneAuthViewModel @Inject constructor(
         val sharedReference = activity.getSharedPreferences("app_prefs",Activity.MODE_PRIVATE)
         sharedReference.edit { putBoolean("isSignedIn", false) }
     }
-
 }
 
 

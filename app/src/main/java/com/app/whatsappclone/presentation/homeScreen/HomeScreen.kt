@@ -61,7 +61,6 @@ fun HomeScreen(navController: NavHostController,homeBaseViewModel: BaseViewModel
         LaunchedEffect(Unit) {
             homeBaseViewModel.getChatForUser(userId){ chats->
 
-
             }
         }
     }
@@ -95,10 +94,13 @@ fun HomeScreen(navController: NavHostController,homeBaseViewModel: BaseViewModel
                 )
                 {
                     Icon(
-                        painter = painterResource(R.drawable.chat_icon), contentDescription = null,
+                        painter = painterResource(R.drawable.add_chat_icon), contentDescription = null,
                         modifier = Modifier
                             .padding(8.dp)
-                            .size(30.dp),
+                            .size(30.dp)
+                            .clickable(true, onClick = {
+                                navController.navigate(Routes.ContactScreen)
+                            }),
                         tint = colorResource(R.color.white)
                     )
                 }

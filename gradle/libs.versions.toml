@@ -1,5 +1,5 @@
 [versions]
-agp = "8.12.2"
+agp = "8.12.3"
 coilCompose = "2.7.0"
 daggerCompiler = "2.57.1"
 daggerCompilerVersion = "2.57.1"
@@ -21,6 +21,7 @@ navigationCompose = "2.9.3"
 googleGmsGoogleServices = "4.4.3"
 firebaseDatabase = "22.0.0"
 playServicesAuth = "21.4.0"
+roomKtx = "2.7.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -53,6 +54,7 @@ androidx-material3 = { group = "androidx.compose.material3", name = "material3" 
 firebase-database = { group = "com.google.firebase", name = "firebase-database", version.ref = "firebaseDatabase" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuth" }
+androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "roomKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

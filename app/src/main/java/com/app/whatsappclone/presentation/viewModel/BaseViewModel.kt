@@ -1,11 +1,16 @@
 package com.app.whatsappclone.presentation.viewModel
 
+import android.content.ContentResolver
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.provider.ContactsContract
 import android.telecom.Call
+import android.telephony.PhoneNumberUtils
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.app.whatsappclone.model.MessageModel
+import com.app.whatsappclone.model.PhoneAuthUser
 import com.app.whatsappclone.presentation.chatListDesign.ChatListModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ChildEventListener
@@ -196,74 +201,74 @@ class BaseViewModel : ViewModel() {
         })
     }
 
-    fun fetchLastMessageFromChat(senderPhoneNumber: String,receiverPhoneNumber: String,onLastMessageFetched:(String,String)-> Unit){
+    fun fetchLastMessageFromChat(
+        senderPhoneNumber: String,
+        receiverPhoneNumber: String,
+        onLastMessageFetched: (String, String) -> Unit
+    ) {
         val chatRef = FirebaseDatabase.getInstance().reference
             .child("messages")
             .child(senderPhoneNumber)
             .child(receiverPhoneNumber)
 
         chatRef.orderByChild("time").limitToLast(1)
-            .addListenerForSingleValueEvent(object : ValueEventListener{
+            .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    if (snapshot.exists())
-                    {
-                        val lastMessage = snapshot.children.firstOrNull()?.child("message")?.value as? String
-                        val timeStamp = snapshot.children.firstOrNull()?.child("time")?.value as? String
-                        onLastMessageFetched(lastMessage?:"No message",timeStamp?:"--:--")
-                    }
-                    else
-                    {
-                        onLastMessageFetched("No message","--:--")
+                    if (snapshot.exists()) {
+                        val lastMessage =
+                            snapshot.children.firstOrNull()?.child("message")?.value as? String
+                        val timeStamp =
+                            snapshot.children.firstOrNull()?.child("time")?.value as? String
+                        onLastMessageFetched(lastMessage ?: "No message", timeStamp ?: "--:--")
+                    } else {
+                        onLastMessageFetched("No message", "--:--")
                     }
                 }
 
-                override fun onCancelled(error: DatabaseError){
-                    onLastMessageFetched("No message","--:--")
-                    
+                override fun onCancelled(error: DatabaseError) {
+                    onLastMessageFetched("No message", "--:--")
+
                 }
             })
     }
 
     fun loadChatList(
-        currentUserPhoneNumber :String,
+        currentUserPhoneNumber: String,
         onChatListLoaded: (List<ChatListModel>) -> Unit
-    )
-    {
+    ) {
         val chatList = mutableListOf<ChatListModel>()
         val chatRef = FirebaseDatabase.getInstance().reference
             .child("chats")
             .child(currentUserPhoneNumber)
 
-        chatRef.addListenerForSingleValueEvent(object: ValueEventListener {
+        chatRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                if(snapshot.exists())
-                {
+                if (snapshot.exists()) {
                     snapshot.children.forEach { child ->
-                        val phoneNumber = child?.key?:return@forEach
-                        val name = child.child("name").value as? String?:return@forEach
-                        val image = child.child("image").value as? String?:return@forEach
+                        val phoneNumber = child?.key ?: return@forEach
+                        val name = child.child("name").value as? String ?: return@forEach
+                        val image = child.child("image").value as? String ?: return@forEach
 
 
                         val profileImageBitmap = decodeBase64ToBitmap(image)
 
-                        fetchLastMessageFromChat(currentUserPhoneNumber,phoneNumber,{
-                            lastMessage , time ->
-                            chatList.add(
-                                ChatListModel(
-                                    name = name,
-                                    image = image,
+                        fetchLastMessageFromChat(
+                            currentUserPhoneNumber,
+                            phoneNumber,
+                            { lastMessage, time ->
+                                chatList.add(
+                                    ChatListModel(
+                                        name = name,
+                                        image = image,
+                                    )
                                 )
-                            )
 
-                            if(chatList.size == snapshot.childrenCount.toInt())
-                            {
-                                onChatListLoaded(chatList)
-                            }
-                            else
-                            {
-                                onChatListLoaded(emptyList())
-                            }
-                        })
+                                if (chatList.size == snapshot.childrenCount.toInt()) {
+                                    onChatListLoaded(chatList)
+                                } else {
+                                    onChatListLoaded(emptyList())
+                                }
+                            })
 
                     }
                 }
@@ -277,25 +282,88 @@ class BaseViewModel : ViewModel() {
 
 
     private fun decodeBase64ToBitmap(base64String: String): Bitmap? {
-        return try{
-            val decodedBytes = android.util.Base64.decode(base64String,android.util.Base64.DEFAULT)
-            BitmapFactory.decodeByteArray(decodedBytes,0,decodedBytes.size)
-        }
-        catch (e: IOException)
-        {
+        return try {
+            val decodedBytes = android.util.Base64.decode(base64String, android.util.Base64.DEFAULT)
+            BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
+        } catch (e: IOException) {
             null
         }
     }
 
-    fun base64toBitmap(base64String : String):Bitmap?{
-        return try{
-            val decodedBytes = android.util.Base64.decode(base64String,android.util.Base64.DEFAULT)
-            val inputStream : InputStream = ByteArrayInputStream(decodedBytes)
+    fun base64toBitmap(base64String: String): Bitmap? {
+        return try {
+            val decodedBytes = android.util.Base64.decode(base64String, android.util.Base64.DEFAULT)
+            val inputStream: InputStream = ByteArrayInputStream(decodedBytes)
             BitmapFactory.decodeStream(inputStream)
-        }
-        catch (e: IOException)
-        {
+        } catch (e: IOException) {
             null
         }
+    }
+
+    fun getPhoneContacts(context: Context): List<PhoneAuthUser> {
+        val contactsList = mutableListOf<PhoneAuthUser>()
+        val resolver: ContentResolver = context.contentResolver
+        val cursor = resolver.query(
+            ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+            null, null, null, null
+        )
+
+        cursor?.use {
+            val nameIndex = it.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)
+            val numberIndex = it.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
+
+            while (it.moveToNext()) {
+                val name = it.getString(nameIndex) ?: "Unknown"
+                val phone = it.getString(numberIndex)?.replace(" ", "") ?: ""
+                contactsList.add(PhoneAuthUser(name = name, phoneNumber = phone))
+            }
+        }
+        return contactsList
+    }
+
+    // Step 2: Fetch Firebase users and match
+    fun fetchWhatsAppContacts(context: Context, onResult: (List<PhoneAuthUser>) -> Unit) {
+        val phoneContacts = getPhoneContacts(context)
+        val database = FirebaseDatabase.getInstance().getReference("users")
+
+        database.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val firebaseContacts = mutableListOf<PhoneAuthUser>()
+                for (child in snapshot.children) {
+                    val user = child.getValue<PhoneAuthUser>(PhoneAuthUser::class.java)
+                    user?.let { firebaseContacts.add(it) }
+                }
+
+                // Match contacts
+                val matched = phoneContacts.filter { phoneContact ->
+                    firebaseContacts.any { firebasePhone ->
+                        PhoneNumberUtils.compare(phoneContact.phoneNumber.replace(" ",""), firebasePhone.phoneNumber.replace(" ",""))
+                    }
+                }
+
+                onResult(matched)
+            }
+
+            override fun onCancelled(error: DatabaseError) {}
+        })
+    }
+    private fun readContacts(context: Context): List<PhoneAuthUser> {
+        val contacts = mutableListOf<PhoneAuthUser>()
+        val cursor = context.contentResolver.query(
+            ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+            null, null, null, null
+        )
+
+        cursor?.use {
+            val nameIndex = it.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)
+            val numberIndex = it.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
+
+            while (it.moveToNext()) {
+                val name = it.getString(nameIndex)
+                val number = it.getString(numberIndex)
+                contacts.add(PhoneAuthUser(name = name, phoneNumber = number))
+            }
+        }
+        return contacts
     }
 }

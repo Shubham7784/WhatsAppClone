@@ -5,7 +5,6 @@ import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
@@ -34,12 +33,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -50,7 +47,6 @@ import com.app.whatsappclone.presentation.navigation.Routes
 import com.app.whatsappclone.presentation.viewModel.PhoneAuthViewModel
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
-import kotlin.contracts.contract
 
 
 @Composable
@@ -59,9 +55,9 @@ fun UserRegistrationProfile(
     phoneAuthViewModel: PhoneAuthViewModel = hiltViewModel()
 ) {
 
-    var name = remember { mutableStateOf("") }
-    var profileImageUri = remember { mutableStateOf<Uri?>(null) }
-    var bitMapImage = remember { mutableStateOf<Bitmap?>(null) }
+    val name = remember { mutableStateOf("") }
+    val profileImageUri = remember { mutableStateOf<Uri?>(null) }
+    val bitMapImage = remember { mutableStateOf<Bitmap?>(null) }
 
 
     val fireBaseAuth = Firebase.auth
@@ -91,7 +87,7 @@ fun UserRegistrationProfile(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp),
+            .padding(top = 48.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
